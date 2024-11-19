@@ -30,10 +30,10 @@ class FileSystem {
       }
     };
 
-    // Default challenge structure
+    // Default challenge structure with contents
     const defaultStructure = {
       thecmdchallenge: {
-        "the-ultimate-joke.txt": "",
+        "the-ultimate-joke.txt": "Why do programmers prefer dark mode? Because light attracts bugs! 🐛",
         "small-name": {
           "level1": {
             "level2": {
@@ -41,7 +41,7 @@ class FileSystem {
                 "level4": {
                   "level5": {
                     "level6": {
-                      "trophy.txt": ""
+                      "trophy.txt": "🏆 Congratulations! You've reached the deepest level!"
                     }
                   }
                 }
@@ -58,11 +58,11 @@ class FileSystem {
         },
         "boringfolder": {
           "child": {
-            "the-mostboring-text.txt": ""
+            "the-mostboring-text.txt": "This is a very boring text. So boring that you'll fall asleep... 😴"
           }
         },
         "kamehameha": {
-          "dragon-ball-jokes.md": ""
+          "dragon-ball-jokes.md": "1. Why did Goku cross the road? To get to the other power level!\n2. What's Vegeta's favorite food? Pride sandwiches!"
         }
       }
     };
@@ -106,6 +106,116 @@ class FileSystem {
   }
 
   // File system operations
+  cat(path) {
+    const target = this.resolvePath(path);
+    if (!target) {
+      return `cat: ${path}: No such file or directory`;
+    }
+    if (target.type === 'directory') {
+      return `cat: ${path}: Is a directory`;
+    }
+    return target.content || '';
+  }
+
+  cp(src, dest) {
+    const sourceNode = this.resolvePath(src);
+    if (!sourceNode) {
+      return `cp: ${src}: No such file or directory`;
+    }
+    if (sourceNode.type === 'directory') {
+      return `cp: ${src}: Is a directory`;
+    }
+    
+    const destDir = this.resolvePath(dest);
+    if (destDir && destDir.type === 'directory') {
+      const newFile = new FileSystemNode(sourceNode.name, 'file', sourceNode.content);
+      newFile.parent = destDir;
+      destDir.children.set(sourceNode.name, newFile);
+    } else {
+      const parentPath = dest.split('/').slice(0, -1).join('/');
+      const fileName = dest.split('/').pop();
+      const parent = parentPath ? this.resolvePath(parentPath) : this.currentDir;
+      
+      if (!parent) {
+        return `cp: cannot create regular file '${dest}': No such file or directory`;
+      }
+      
+      const newFile = new FileSystemNode(fileName, 'file', sourceNode.content);
+      newFile.parent = parent;
+      parent.children.set(fileName, newFile);
+    }
+    return '';
+  }
+
+  mv(src, dest) {
+    const sourceNode = this.resolvePath(src);
+    if (!sourceNode) {
+      return `mv: ${src}: No such file or directory`;
+    }
+    
+    const destDir = this.resolvePath(dest);
+    if (destDir && destDir.type === 'directory') {
+      sourceNode.parent.children.delete(sourceNode.name);
+      sourceNode.parent = destDir;
+      sourceNode.name = sourceNode.name;
+      destDir.children.set(sourceNode.name, sourceNode);
+    } else {
+      const parentPath = dest.split('/').slice(0, -1).join('/');
+      const fileName = dest.split('/').pop();
+      const parent = parentPath ? this.resolvePath(parentPath) : this.currentDir;
+      
+      if (!parent) {
+        return `mv: cannot move '${src}' to '${dest}': No such file or directory`;
+      }
+      
+      sourceNode.parent.children.delete(sourceNode.name);
+      sourceNode.parent = parent;
+      sourceNode.name = fileName;
+      parent.children.set(fileName, sourceNode);
+    }
+    return '';
+  }
+
+  ls(path, { showHidden = false, recursive = false } = {}) {
+    const target = path ? this.resolvePath(path) : this.currentDir;
+    if (!target) {
+      return `ls: ${path}: No such file or directory`;
+    }
+    if (target.type === 'file') {
+      return target.name;
+    }
+    
+    const formatDirectory = (dir, prefix = '') => {
+      let result = '';
+      const entries = Array.from(dir.children.entries());
+      
+      if (prefix) {
+        result += `\n${prefix}:\n`;
+      }
+      
+      const visibleEntries = showHidden ? 
+        entries : 
+        entries.filter(([name]) => !name.startsWith('.'));
+        
+      result += visibleEntries
+        .map(([name]) => name)
+        .join('\n');
+        
+      if (recursive) {
+        entries
+          .filter(([, node]) => node.type === 'directory')
+          .forEach(([name, node]) => {
+            const newPrefix = prefix ? `${prefix}/${name}` : name;
+            result += formatDirectory(node, newPrefix);
+          });
+      }
+      
+      return result;
+    };
+    
+    return formatDirectory(target);
+  }
+
   mkdir(name) {
     if (this.currentDir.children.has(name)) {
       return `mkdir: ${name}: Directory already exists`;
@@ -132,17 +242,6 @@ class FileSystem {
     
     this.currentDir = target;
     return '';
-  }
-
-  ls(path) {
-    const target = path ? this.resolvePath(path) : this.currentDir;
-    if (!target) {
-      return `ls: ${path}: No such file or directory`;
-    }
-    if (target.type === 'file') {
-      return target.name;
-    }
-    return Array.from(target.children.keys()).join('\n') || '';
   }
 
   pwd() {
