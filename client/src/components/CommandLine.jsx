@@ -36,25 +36,63 @@ const CommandLine = ({
     setSelectedSuggestion(-1);
   };
 
+  const applySuggestion = (suggestion) => {
+    const parts = input.split(' ');
+    if (parts.length <= 1) {
+      setInput(suggestion);
+    } else {
+      parts[parts.length - 1] = suggestion;
+      setInput(parts.join(' '));
+    }
+    setSuggestions([]);
+    setSelectedSuggestion(-1);
+    // Set cursor at the end of input after suggestion is applied
+    setTimeout(() => {
+      if (inputRef.current) {
+        inputRef.current.selectionStart = inputRef.current.value.length;
+        inputRef.current.selectionEnd = inputRef.current.value.length;
+      }
+    }, 0);
+  };
+
+  const updateInputWithSelectedSuggestion = () => {
+    if (selectedSuggestion !== -1 && suggestions.length > 0) {
+      const parts = input.split(' ');
+      const newInput = parts.length <= 1 
+        ? suggestions[selectedSuggestion]
+        : parts.slice(0, -1).concat(suggestions[selectedSuggestion]).join(' ');
+      setInput(newInput);
+    }
+  };
+
   const handleKeyDown = (e) => {
+    if (suggestions.length > 0) {
+      if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        const newIndex = e.key === 'ArrowUp'
+          ? (selectedSuggestion > 0 ? selectedSuggestion - 1 : suggestions.length - 1)
+          : (selectedSuggestion < suggestions.length - 1 ? selectedSuggestion + 1 : 0);
+        
+        setSelectedSuggestion(newIndex);
+        // Update input as user navigates through suggestions
+        const parts = input.split(' ');
+        const updatedInput = parts.length <= 1 
+          ? suggestions[newIndex]
+          : parts.slice(0, -1).concat(suggestions[newIndex]).join(' ');
+        setInput(updatedInput);
+        return;
+      }
+      
+      if (e.key === 'Enter' && selectedSuggestion !== -1) {
+        e.preventDefault();
+        applySuggestion(suggestions[selectedSuggestion]);
+        return;
+      }
+    }
+
     if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
       e.preventDefault();
-      
-      if (suggestions.length > 0) {
-        // Navigate through suggestions
-        if (e.key === 'ArrowUp') {
-          setSelectedSuggestion(prev => 
-            prev > 0 ? prev - 1 : suggestions.length - 1
-          );
-        } else {
-          setSelectedSuggestion(prev => 
-            prev < suggestions.length - 1 ? prev + 1 : 0
-          );
-        }
-      } else {
-        // Navigate through history
-        onHistoryNavigate(e.key === 'ArrowUp' ? 'up' : 'down');
-      }
+      onHistoryNavigate(e.key === 'ArrowUp' ? 'up' : 'down');
     } else if (e.key === 'Tab') {
       e.preventDefault();
       
@@ -62,18 +100,17 @@ const CommandLine = ({
         // Get new suggestions
         const newSuggestions = getSuggestions(input);
         setSuggestions(newSuggestions);
-        setSelectedSuggestion(newSuggestions.length > 0 ? 0 : -1);
-      } else if (selectedSuggestion !== -1) {
-        // Apply selected suggestion
-        const parts = input.split(' ');
-        if (parts.length <= 1) {
-          setInput(suggestions[selectedSuggestion]);
-        } else {
-          parts[parts.length - 1] = suggestions[selectedSuggestion];
-          setInput(parts.join(' '));
+        if (newSuggestions.length > 0) {
+          setSelectedSuggestion(0);
+          // Update input with first suggestion
+          const parts = input.split(' ');
+          const updatedInput = parts.length <= 1 
+            ? newSuggestions[0]
+            : parts.slice(0, -1).concat(newSuggestions[0]).join(' ');
+          setInput(updatedInput);
         }
-        setSuggestions([]);
-        setSelectedSuggestion(-1);
+      } else if (selectedSuggestion !== -1) {
+        applySuggestion(suggestions[selectedSuggestion]);
       }
     } else if (e.key === 'Escape') {
       setSuggestions([]);
@@ -111,15 +148,7 @@ const CommandLine = ({
                 index === selectedSuggestion ? styles.selected : ''
               }`}
               onClick={() => {
-                const parts = input.split(' ');
-                if (parts.length <= 1) {
-                  setInput(suggestion);
-                } else {
-                  parts[parts.length - 1] = suggestion;
-                  setInput(parts.join(' '));
-                }
-                setSuggestions([]);
-                setSelectedSuggestion(-1);
+                applySuggestion(suggestion);
                 inputRef.current?.focus();
               }}
             >
