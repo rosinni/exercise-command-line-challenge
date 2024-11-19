@@ -12,6 +12,62 @@ class FileSystem {
   constructor() {
     this.root = new FileSystemNode('/', 'directory');
     this.currentDir = this.root;
+    this.initializeDefaultStructure();
+  }
+
+  initializeDefaultStructure() {
+    // Helper function to recursively create the structure
+    const createStructure = (parentNode, structure) => {
+      for (const [name, value] of Object.entries(structure)) {
+        const isFile = typeof value === 'string';
+        const node = new FileSystemNode(name, isFile ? 'file' : 'directory', isFile ? value : '');
+        node.parent = parentNode;
+        parentNode.children.set(name, node);
+        
+        if (!isFile) {
+          createStructure(node, value);
+        }
+      }
+    };
+
+    // Default challenge structure
+    const defaultStructure = {
+      thecmdchallenge: {
+        "the-ultimate-joke.txt": "",
+        "small-name": {
+          "level1": {
+            "level2": {
+              "level3": {
+                "level4": {
+                  "level5": {
+                    "level6": {
+                      "trophy.txt": ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "funcode": {
+          "kids.jpg": "",
+          "the-most-funny": {},
+          "images": {
+            "hello": {}
+          }
+        },
+        "boringfolder": {
+          "child": {
+            "the-mostboring-text.txt": ""
+          }
+        },
+        "kamehameha": {
+          "dragon-ball-jokes.md": ""
+        }
+      }
+    };
+
+    createStructure(this.root, defaultStructure);
   }
 
   // Helper method to resolve path
