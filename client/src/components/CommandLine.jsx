@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import styles from '../styles/Terminal.module.css';
-import { getSuggestions } from '../lib/commands';
+import React, { useState, useEffect } from "react";
+import styles from "../styles/Terminal.module.css";
+import { getSuggestions } from "../lib/commands";
 
-const CommandLine = ({ 
-  onSubmit, 
-  onClear, 
-  history, 
-  historyIndex, 
+const CommandLine = ({
+  onSubmit,
+  onClear,
+  history,
+  historyIndex,
   onHistoryNavigate,
   currentPath,
-  inputRef  // Added inputRef prop
+  inputRef, // Added inputRef prop
 }) => {
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [selectedSuggestion, setSelectedSuggestion] = useState(-1);
 
@@ -25,39 +25,39 @@ const CommandLine = ({
   const handleSubmit = (e) => {
     e.preventDefault();
     const trimmedInput = input.trim();
-    
-    if (trimmedInput === 'clear') {
+
+    if (trimmedInput === "clear") {
       onClear();
     } else if (trimmedInput) {
       onSubmit(trimmedInput);
     }
-    
-    setInput('');
+
+    setInput("");
     setSuggestions([]);
     setSelectedSuggestion(-1);
   };
 
   const applySuggestion = (suggestion) => {
-    const parts = input.split(' ');
+    const parts = input.split(" ");
     if (parts.length <= 1) {
       setInput(suggestion);
     } else {
       parts[parts.length - 1] = suggestion;
-      setInput(parts.join(' '));
+      setInput(parts.join(" "));
     }
     setSuggestions([]);
     setSelectedSuggestion(-1);
-    
+
     // If suggestion ends with '/', trigger new suggestions for the directory
-    if (suggestion.endsWith('/')) {
-      setTimeout(() => {
-        const newSuggestions = getSuggestions(parts[0] + ' ' + suggestion);
-        setSuggestions(newSuggestions);
-        if (newSuggestions.length > 0) {
-          setSelectedSuggestion(0);
-        }
-      }, 0);
-    }
+    // if (suggestion.endsWith('/')) {
+    //   setTimeout(() => {
+    //     const newSuggestions = getSuggestions(parts[0] + ' ' + suggestion);
+    //     setSuggestions(newSuggestions);
+    //     if (newSuggestions.length > 0) {
+    //       setSelectedSuggestion(0);
+    //     }
+    //   }, 0);
+    // }
 
     // Set cursor at the end of input after suggestion is applied
     setTimeout(() => {
@@ -70,45 +70,55 @@ const CommandLine = ({
 
   const updateInputWithSelectedSuggestion = () => {
     if (selectedSuggestion !== -1 && suggestions.length > 0) {
-      const parts = input.split(' ');
-      const newInput = parts.length <= 1 
-        ? suggestions[selectedSuggestion]
-        : parts.slice(0, -1).concat(suggestions[selectedSuggestion]).join(' ');
+      const parts = input.split(" ");
+      const newInput =
+        parts.length <= 1
+          ? suggestions[selectedSuggestion]
+          : parts
+              .slice(0, -1)
+              .concat(suggestions[selectedSuggestion])
+              .join(" ");
       setInput(newInput);
     }
   };
 
   const handleKeyDown = (e) => {
     if (suggestions.length > 0) {
-      if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+      if (e.key === "ArrowUp" || e.key === "ArrowDown") {
         e.preventDefault();
-        const newIndex = e.key === 'ArrowUp'
-          ? (selectedSuggestion > 0 ? selectedSuggestion - 1 : suggestions.length - 1)
-          : (selectedSuggestion < suggestions.length - 1 ? selectedSuggestion + 1 : 0);
-        
+        const newIndex =
+          e.key === "ArrowUp"
+            ? selectedSuggestion > 0
+              ? selectedSuggestion - 1
+              : suggestions.length - 1
+            : selectedSuggestion < suggestions.length - 1
+              ? selectedSuggestion + 1
+              : 0;
+
         setSelectedSuggestion(newIndex);
         // Update input as user navigates through suggestions
-        const parts = input.split(' ');
-        const updatedInput = parts.length <= 1 
-          ? suggestions[newIndex]
-          : parts.slice(0, -1).concat(suggestions[newIndex]).join(' ');
+        const parts = input.split(" ");
+        const updatedInput =
+          parts.length <= 1
+            ? suggestions[newIndex]
+            : parts.slice(0, -1).concat(suggestions[newIndex]).join(" ");
         setInput(updatedInput);
         return;
       }
-      
-      if (e.key === 'Enter' && selectedSuggestion !== -1) {
+
+      if (e.key === "Enter" && selectedSuggestion !== -1) {
         e.preventDefault();
         applySuggestion(suggestions[selectedSuggestion]);
         return;
       }
     }
 
-    if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+    if (e.key === "ArrowUp" || e.key === "ArrowDown") {
       e.preventDefault();
-      onHistoryNavigate(e.key === 'ArrowUp' ? 'up' : 'down');
-    } else if (e.key === 'Tab') {
+      onHistoryNavigate(e.key === "ArrowUp" ? "up" : "down");
+    } else if (e.key === "Tab") {
       e.preventDefault();
-      
+
       if (suggestions.length === 0) {
         // Get new suggestions
         const newSuggestions = getSuggestions(input);
@@ -116,16 +126,17 @@ const CommandLine = ({
         if (newSuggestions.length > 0) {
           setSelectedSuggestion(0);
           // Update input with first suggestion
-          const parts = input.split(' ');
-          const updatedInput = parts.length <= 1 
-            ? newSuggestions[0]
-            : parts.slice(0, -1).concat(newSuggestions[0]).join(' ');
+          const parts = input.split(" ");
+          const updatedInput =
+            parts.length <= 1
+              ? newSuggestions[0]
+              : parts.slice(0, -1).concat(newSuggestions[0]).join(" ");
           setInput(updatedInput);
         }
       } else if (selectedSuggestion !== -1) {
         applySuggestion(suggestions[selectedSuggestion]);
       }
-    } else if (e.key === 'Escape') {
+    } else if (e.key === "Escape") {
       setSuggestions([]);
       setSelectedSuggestion(-1);
     }
@@ -158,7 +169,7 @@ const CommandLine = ({
             <div
               key={suggestion}
               className={`${styles.suggestion} ${
-                index === selectedSuggestion ? styles.selected : ''
+                index === selectedSuggestion ? styles.selected : ""
               }`}
               onClick={() => {
                 applySuggestion(suggestion);

@@ -3,6 +3,7 @@ import Confetti from "react-confetti";
 import CommandLine from "../components/CommandLine";
 import Instructions from "../components/Instructions";
 import TutorialOverlay from "../components/TutorialOverlay";
+import ChooseTutorial from "../components/ChooseTutorial";
 import styles from "../styles/Terminal.module.css";
 import { executeCommand } from "../lib/commands";
 import useCommandHistory from "../hooks/useCommandHistory";
@@ -10,31 +11,57 @@ import { tutorials, checkCommand } from "../lib/tutorials";
 import { fileSystem } from "../lib/fileSystem";
 
 const Terminal = () => {
+  // Get language from URL query parameter, default to 'en'
+  const [currentLanguage, setCurrentLanguage] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("lang") || "en";
+  });
+
   const [output, setOutput] = useState([
-    { type: "system", content: "Welcome to Terminal Simulator v1.0.0" },
-    { type: "system", content: 'Type "help" to see available commands.' },
     {
       type: "system",
-      content: "A tutorial will guide you through the basics.",
+      content:
+        currentLanguage === "en"
+          ? "Welcome to 4Geeks' Terminal Simulator v1.0.0"
+          : "Bienvenido al Simulador de Terminal de 4Geeks v1.0.0",
+    },
+    {
+      type: "system",
+      content:
+        currentLanguage === "en"
+          ? 'Type "help" to see available commands.'
+          : 'Escribe "help" para ver los comandos disponibles.',
+    },
+    {
+      type: "system",
+      content:
+        currentLanguage === "en"
+          ? "A tutorial will guide you through the basics."
+          : "Un tutorial te guiará a través de los conceptos básicos.",
     },
   ]);
 
   const { history, addToHistory, navigateHistory, historyIndex } =
     useCommandHistory();
-  const [currentTutorial, setCurrentTutorial] = useState(tutorials[0]);
+  const [currentTutorial, setCurrentTutorial] = useState(null);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
-  const [currentPath, setCurrentPath] = useState('/');
+  const [currentPath, setCurrentPath] = useState("/");
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
   });
 
-  // Add ref for terminal input
   const terminalInputRef = useRef(null);
 
-  // Update window size on resize
+  function loadTutorial(tutorialIndex) {
+    setCurrentTutorial(tutorials[tutorialIndex]);
+    fileSystem.initializeDefaultStructure(
+      tutorials[tutorialIndex].defaultStructure || {},
+    );
+  }
+
   useEffect(() => {
     const handleResize = () => {
       setWindowSize({
@@ -47,72 +74,80 @@ const Terminal = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  const nextStep = () => {
+    if (currentStepIndex < currentTutorial.steps.length - 1) {
+      setCurrentStepIndex((prev) => prev + 1);
+    } else {
+      setOutput((prev) => [
+        ...prev,
+        {
+          type: "system",
+          content:
+            currentLanguage === "en"
+              ? "🎉 Congratulations! You've completed the tutorial!"
+              : "🎉 ¡Felicitaciones! ¡Has completado el tutorial!",
+        },
+      ]);
+      setCurrentTutorial(tutorials[0]);
+    }
+  };
+
   const handleCommand = (command) => {
     if (!command.trim()) return;
 
-    // Add command to output
     setOutput((prev) => [...prev, { type: "input", content: command }]);
 
-    // Special case for clear command
     if (command.trim().toLowerCase() === "clear") {
       setOutput([]);
       return;
     }
 
-    // Execute command and get result
     const result = executeCommand(command);
     setOutput((prev) => [...prev, { type: "output", content: result }]);
     addToHistory(command);
 
-    // Update current path after command execution
-    if (command.trim().toLowerCase().startsWith('cd ')) {
+    if (command.trim().toLowerCase().startsWith("cd ")) {
       setCurrentPath(fileSystem.pwd());
     }
 
-    // Check if command matches tutorial step
     if (
       currentTutorial &&
       checkCommand(command, currentTutorial.steps[currentStepIndex])
     ) {
-      // Show confetti animation
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 3000);
-
-      // Move to next step
-      if (currentStepIndex < currentTutorial.steps.length - 1) {
-        setCurrentStepIndex((prev) => prev + 1);
-      } else {
-        // Tutorial completed
-        setOutput((prev) => [
-          ...prev,
-          {
-            type: "system",
-            content: "🎉 Congratulations! You've completed the basic tutorial!",
-          },
-        ]);
-        setCurrentTutorial(null);
-      }
+      nextStep();
     }
   };
 
   const handleSkipTutorial = () => {
-    setCurrentTutorial(null);
+    setCurrentTutorial(tutorials[0]);
     setOutput((prev) => [
       ...prev,
       {
         type: "system",
-        content: 'Tutorial skipped. Type "help" if you need assistance.',
+        content:
+          currentLanguage === "en"
+            ? 'Tutorial skipped. Type "help" if you need assistance.'
+            : 'Tutorial omitido. Escribe "help" si necesitas ayuda.',
       },
     ]);
   };
 
-  // Auto-scroll to bottom when output changes
   useEffect(() => {
     const terminal = document.querySelector(`.${styles.output}`);
     if (terminal) {
       terminal.scrollTop = terminal.scrollHeight;
     }
   }, [output]);
+
+  if (!currentTutorial)
+    return (
+      <ChooseTutorial
+        onChoose={(tutorialIndex) => loadTutorial(tutorialIndex)}
+        currentLanguage={currentLanguage}
+      />
+    );
 
   return (
     <div className={styles.container}>
@@ -128,18 +163,19 @@ const Terminal = () => {
       <button
         className={styles.hamburgerButton}
         onClick={() => setShowInstructions((prev) => !prev)}
-        aria-label="Toggle instructions"
+        aria-label={
+          currentLanguage === "en"
+            ? "Toggle instructions"
+            : "Alternar instrucciones"
+        }
       >
         ☰
       </button>
       <div
         className={styles.terminal}
         onClick={(e) => {
-          // Check if there's any selected text
           const selection = window.getSelection();
           const hasSelection = selection.toString().length > 0;
-          
-          // Only focus input if no text is selected
           if (!hasSelection && terminalInputRef.current) {
             terminalInputRef.current.focus();
           }
@@ -167,12 +203,14 @@ const Terminal = () => {
       <div
         className={`${styles.instructions} ${showInstructions ? "" : styles.collapsed}`}
       >
-        <Instructions />
+        <Instructions currentLanguage={currentLanguage} />
       </div>
       <TutorialOverlay
         currentTutorial={currentTutorial}
         currentStep={currentTutorial?.steps[currentStepIndex]}
         onSkip={handleSkipTutorial}
+        onContinue={() => nextStep()}
+        currentLanguage={currentLanguage}
       />
     </div>
   );

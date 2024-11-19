@@ -24,10 +24,10 @@
 }
 
 .controls {
-  display: flex;
   justify-content: space-between;
   align-items: center;
   margin-top: 1rem;
+  display: flex;
 }
 
 .skipButton {
@@ -39,6 +39,7 @@
   cursor: pointer;
   font-family: inherit;
   transition: all 0.3s ease;
+  margin-right: 5px;
 }
 
 .skipButton:hover {

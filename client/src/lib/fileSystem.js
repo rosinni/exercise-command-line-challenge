@@ -1,5 +1,5 @@
 class FileSystemNode {
-  constructor(name, type = 'file', content = '') {
+  constructor(name, type = "file", content = "") {
     this.name = name;
     this.type = type; // 'file' or 'directory'
     this.content = content;
@@ -10,59 +10,25 @@ class FileSystemNode {
 
 class FileSystem {
   constructor() {
-    this.root = new FileSystemNode('/', 'directory');
+    this.root = new FileSystemNode("/", "directory");
     this.currentDir = this.root;
-    this.initializeDefaultStructure();
   }
 
-  initializeDefaultStructure() {
+  initializeDefaultStructure(defaultStructure = {}) {
     // Helper function to recursively create the structure
     const createStructure = (parentNode, structure) => {
       for (const [name, value] of Object.entries(structure)) {
-        const isFile = typeof value === 'string';
-        const node = new FileSystemNode(name, isFile ? 'file' : 'directory', isFile ? value : '');
+        const isFile = typeof value === "string";
+        const node = new FileSystemNode(
+          name,
+          isFile ? "file" : "directory",
+          isFile ? value : "",
+        );
         node.parent = parentNode;
         parentNode.children.set(name, node);
-        
+
         if (!isFile) {
           createStructure(node, value);
-        }
-      }
-    };
-
-    // Default challenge structure with contents
-    const defaultStructure = {
-      thecmdchallenge: {
-        "the-ultimate-joke.txt": "Why do programmers prefer dark mode? Because light attracts bugs! 🐛",
-        "small-name": {
-          "level1": {
-            "level2": {
-              "level3": {
-                "level4": {
-                  "level5": {
-                    "level6": {
-                      "trophy.txt": "🏆 Congratulations! You've reached the deepest level!"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "funcode": {
-          "kids.jpg": "",
-          "the-most-funny": {},
-          "images": {
-            "hello": {}
-          }
-        },
-        "boringfolder": {
-          "child": {
-            "the-mostboring-text.txt": "This is a very boring text. So boring that you'll fall asleep... 😴"
-          }
-        },
-        "kamehameha": {
-          "dragon-ball-jokes.md": "1. Why did Goku cross the road? To get to the other power level!\n2. What's Vegeta's favorite food? Pride sandwiches!"
         }
       }
     };
@@ -73,14 +39,14 @@ class FileSystem {
   // Helper method to resolve path
   resolvePath(path) {
     if (!path) return this.currentDir;
-    
-    const parts = path.split('/').filter(Boolean);
-    let current = path.startsWith('/') ? this.root : this.currentDir;
-    
+
+    const parts = path.split("/").filter(Boolean);
+    let current = path.startsWith("/") ? this.root : this.currentDir;
+
     for (const part of parts) {
-      if (part === '..') {
+      if (part === "..") {
         current = current.parent || current;
-      } else if (part !== '.') {
+      } else if (part !== ".") {
         const next = current.children.get(part);
         if (!next) return null;
         current = next;
@@ -91,18 +57,18 @@ class FileSystem {
 
   // Helper to create all parent directories
   mkdirp(path) {
-    const parts = path.split('/').filter(Boolean);
+    const parts = path.split("/").filter(Boolean);
     let current = this.currentDir;
-    
+
     for (const part of parts) {
       if (!current.children.has(part)) {
-        const newDir = new FileSystemNode(part, 'directory');
+        const newDir = new FileSystemNode(part, "directory");
         newDir.parent = current;
         current.children.set(part, newDir);
       }
       current = current.children.get(part);
     }
-    return '';
+    return "";
   }
 
   // File system operations
@@ -111,10 +77,10 @@ class FileSystem {
     if (!target) {
       return `cat: ${path}: No such file or directory`;
     }
-    if (target.type === 'directory') {
+    if (target.type === "directory") {
       return `cat: ${path}: Is a directory`;
     }
-    return target.content || '';
+    return target.content || "";
   }
 
   cp(src, dest) {
@@ -122,29 +88,35 @@ class FileSystem {
     if (!sourceNode) {
       return `cp: ${src}: No such file or directory`;
     }
-    if (sourceNode.type === 'directory') {
+    if (sourceNode.type === "directory") {
       return `cp: ${src}: Is a directory`;
     }
-    
+
     const destDir = this.resolvePath(dest);
-    if (destDir && destDir.type === 'directory') {
-      const newFile = new FileSystemNode(sourceNode.name, 'file', sourceNode.content);
+    if (destDir && destDir.type === "directory") {
+      const newFile = new FileSystemNode(
+        sourceNode.name,
+        "file",
+        sourceNode.content,
+      );
       newFile.parent = destDir;
       destDir.children.set(sourceNode.name, newFile);
     } else {
-      const parentPath = dest.split('/').slice(0, -1).join('/');
-      const fileName = dest.split('/').pop();
-      const parent = parentPath ? this.resolvePath(parentPath) : this.currentDir;
-      
+      const parentPath = dest.split("/").slice(0, -1).join("/");
+      const fileName = dest.split("/").pop();
+      const parent = parentPath
+        ? this.resolvePath(parentPath)
+        : this.currentDir;
+
       if (!parent) {
         return `cp: cannot create regular file '${dest}': No such file or directory`;
       }
-      
-      const newFile = new FileSystemNode(fileName, 'file', sourceNode.content);
+
+      const newFile = new FileSystemNode(fileName, "file", sourceNode.content);
       newFile.parent = parent;
       parent.children.set(fileName, newFile);
     }
-    return '';
+    return "";
   }
 
   mv(src, dest) {
@@ -152,28 +124,30 @@ class FileSystem {
     if (!sourceNode) {
       return `mv: ${src}: No such file or directory`;
     }
-    
+
     const destDir = this.resolvePath(dest);
-    if (destDir && destDir.type === 'directory') {
+    if (destDir && destDir.type === "directory") {
       sourceNode.parent.children.delete(sourceNode.name);
       sourceNode.parent = destDir;
       sourceNode.name = sourceNode.name;
       destDir.children.set(sourceNode.name, sourceNode);
     } else {
-      const parentPath = dest.split('/').slice(0, -1).join('/');
-      const fileName = dest.split('/').pop();
-      const parent = parentPath ? this.resolvePath(parentPath) : this.currentDir;
-      
+      const parentPath = dest.split("/").slice(0, -1).join("/");
+      const fileName = dest.split("/").pop();
+      const parent = parentPath
+        ? this.resolvePath(parentPath)
+        : this.currentDir;
+
       if (!parent) {
         return `mv: cannot move '${src}' to '${dest}': No such file or directory`;
       }
-      
+
       sourceNode.parent.children.delete(sourceNode.name);
       sourceNode.parent = parent;
       sourceNode.name = fileName;
       parent.children.set(fileName, sourceNode);
     }
-    return '';
+    return "";
   }
 
   ls(path, { showHidden = false, recursive = false } = {}) {
@@ -181,38 +155,36 @@ class FileSystem {
     if (!target) {
       return `ls: ${path}: No such file or directory`;
     }
-    if (target.type === 'file') {
+    if (target.type === "file") {
       return target.name;
     }
-    
-    const formatDirectory = (dir, prefix = '') => {
-      let result = '';
+
+    const formatDirectory = (dir, prefix = "") => {
+      let result = "";
       const entries = Array.from(dir.children.entries());
-      
+
       if (prefix) {
         result += `\n${prefix}:\n`;
       }
-      
-      const visibleEntries = showHidden ? 
-        entries : 
-        entries.filter(([name]) => !name.startsWith('.'));
-        
-      result += visibleEntries
-        .map(([name]) => name)
-        .join('\n');
-        
+
+      const visibleEntries = showHidden
+        ? entries
+        : entries.filter(([name]) => !name.startsWith("."));
+
+      result += visibleEntries.map(([name]) => name).join("\n");
+
       if (recursive) {
         entries
-          .filter(([, node]) => node.type === 'directory')
+          .filter(([, node]) => node.type === "directory")
           .forEach(([name, node]) => {
             const newPrefix = prefix ? `${prefix}/${name}` : name;
             result += formatDirectory(node, newPrefix);
           });
       }
-      
+
       return result;
     };
-    
+
     return formatDirectory(target);
   }
 
@@ -220,28 +192,28 @@ class FileSystem {
     if (this.currentDir.children.has(name)) {
       return `mkdir: ${name}: Directory already exists`;
     }
-    const newDir = new FileSystemNode(name, 'directory');
+    const newDir = new FileSystemNode(name, "directory");
     newDir.parent = this.currentDir;
     this.currentDir.children.set(name, newDir);
-    return '';
+    return "";
   }
 
   cd(path) {
-    if (path === '/') {
+    if (path === "/") {
       this.currentDir = this.root;
-      return '';
+      return "";
     }
-    
+
     const target = this.resolvePath(path);
     if (!target) {
       return `cd: ${path}: No such directory`;
     }
-    if (target.type !== 'directory') {
+    if (target.type !== "directory") {
       return `cd: ${path}: Not a directory`;
     }
-    
+
     this.currentDir = target;
-    return '';
+    return "";
   }
 
   pwd() {
@@ -249,80 +221,86 @@ class FileSystem {
     let current = this.currentDir;
     while (current) {
       if (current === this.root) {
-        parts.unshift('');
+        parts.unshift("");
         break;
       }
       parts.unshift(current.name);
       current = current.parent;
     }
-    return parts.join('/') || '/';
+    return parts.join("/") || "/";
   }
 
   touch(name) {
     if (this.currentDir.children.has(name)) {
       return `touch: ${name}: File already exists`;
     }
-    const newFile = new FileSystemNode(name, 'file');
+    const newFile = new FileSystemNode(name, "file");
     newFile.parent = this.currentDir;
     this.currentDir.children.set(name, newFile);
-    return '';
+    return "";
   }
 
   rm(path) {
     if (!path) {
-      return 'rm: missing operand';
+      return "rm: missing operand";
     }
-    
-    const parts = path.split('/');
+
+    const parts = path.split("/");
     const name = parts.pop();
-    const parentPath = parts.join('/');
+    const parentPath = parts.join("/");
     const parent = parentPath ? this.resolvePath(parentPath) : this.currentDir;
-    
+
     if (!parent || !parent.children.has(name)) {
       return `rm: ${path}: No such file or directory`;
     }
-    
+
     const target = parent.children.get(name);
-    if (target.type === 'directory') {
+    if (target.type === "directory") {
       return `rm: ${path}: Is a directory`;
     }
-    
+
     parent.children.delete(name);
-    return '';
+    return "";
   }
 
   rmdir(path) {
     if (!path) {
-      return 'rm: missing operand';
+      return "rm: missing operand";
     }
-    
-    const parts = path.split('/');
+
+    const parts = path.split("/");
     const name = parts.pop();
-    const parentPath = parts.join('/');
+    const parentPath = parts.join("/");
     const parent = parentPath ? this.resolvePath(parentPath) : this.currentDir;
-    
+
     if (!parent || !parent.children.has(name)) {
       return `rm: ${path}: No such file or directory`;
     }
-    
+
     parent.children.delete(name);
-    return '';
+    return "";
   }
 
-  tree(node = this.currentDir, prefix = '', isLast = true) {
-    const nodeType = node.type === 'directory' ? '📁' : '📄';
-    const connector = isLast ? '└── ' : '├── ';
-    let result = prefix + connector + nodeType + ' ' + (node === this.root ? '/' : node.name) + '\n';
-    
-    if (node.type === 'directory') {
+  tree(node = this.currentDir, prefix = "", isLast = true) {
+    const nodeType = node.type === "directory" ? "📁" : "📄";
+    const connector = isLast ? "└── " : "├── ";
+    let result =
+      prefix +
+      connector +
+      nodeType +
+      " " +
+      (node === this.root ? "/" : node.name) +
+      "\n";
+
+    if (node.type === "directory") {
       const children = Array.from(node.children.values());
       children.forEach((child, index) => {
         const isLastChild = index === children.length - 1;
-        const newPrefix = prefix + (isLast ? '    ' : '│   ');
+        const newPrefix = prefix + (isLast ? "    " : "│   ");
         result += this.tree(child, newPrefix, isLastChild);
       });
     }
-    
+
     return result;
   }
 }
