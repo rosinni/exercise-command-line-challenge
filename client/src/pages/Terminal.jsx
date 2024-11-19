@@ -134,8 +134,13 @@ const Terminal = () => {
       </button>
       <div
         className={styles.terminal}
-        onClick={() => {
-          if (terminalInputRef.current) {
+        onClick={(e) => {
+          // Check if there's any selected text
+          const selection = window.getSelection();
+          const hasSelection = selection.toString().length > 0;
+          
+          // Only focus input if no text is selected
+          if (!hasSelection && terminalInputRef.current) {
             terminalInputRef.current.focus();
           }
         }}
