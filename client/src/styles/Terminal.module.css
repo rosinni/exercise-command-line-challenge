@@ -21,10 +21,16 @@
   padding-bottom: 1rem;
 }
 
+.commandLineContainer {
+  position: relative;
+  width: 100%;
+}
+
 .commandLine {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  width: 100%;
 }
 
 .prompt {
@@ -45,6 +51,35 @@
 
 .input:focus {
   outline: none;
+}
+
+.suggestions {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  background-color: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 4px;
+  margin-bottom: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.suggestion {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  color: #f0f0f0;
+}
+
+.suggestion:hover {
+  background-color: #333;
+}
+
+.suggestion.selected {
+  background-color: #444;
+  color: #00ff00;
 }
 
 .system {

@@ -33,9 +33,11 @@ const Instructions = () => {
       <div className={styles.shortcuts}>
         <h3>Keyboard Shortcuts:</h3>
         <ul>
-          <li>↑/↓ - Navigate command history</li>
+          <li>Tab - Show command suggestions</li>
+          <li>↑/↓ - Navigate suggestions/history</li>
           <li>Enter - Execute command</li>
           <li>Ctrl+L or 'clear' - Clear screen</li>
+          <li>Esc - Close suggestions</li>
         </ul>
       </div>
     </div>
