@@ -7,7 +7,8 @@ const CommandLine = ({
   onClear, 
   history, 
   historyIndex, 
-  onHistoryNavigate 
+  onHistoryNavigate,
+  currentPath 
 }) => {
   const [input, setInput] = useState('');
   const [suggestions, setSuggestions] = useState([]);
@@ -139,7 +140,7 @@ const CommandLine = ({
   return (
     <div className={styles.commandLineContainer}>
       <form onSubmit={handleSubmit} className={styles.commandLine}>
-        <span className={styles.prompt}>$</span>
+        <span className={styles.prompt}>{currentPath}$</span>
         <input
           ref={inputRef}
           type="text"

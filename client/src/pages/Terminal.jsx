@@ -7,6 +7,7 @@ import styles from "../styles/Terminal.module.css";
 import { executeCommand } from "../lib/commands";
 import useCommandHistory from "../hooks/useCommandHistory";
 import { tutorials, checkCommand } from "../lib/tutorials";
+import { fileSystem } from "../lib/fileSystem";
 
 const Terminal = () => {
   const [output, setOutput] = useState([
@@ -24,6 +25,7 @@ const Terminal = () => {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
+  const [currentPath, setCurrentPath] = useState('/');
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
@@ -58,6 +60,11 @@ const Terminal = () => {
     const result = executeCommand(command);
     setOutput((prev) => [...prev, { type: "output", content: result }]);
     addToHistory(command);
+
+    // Update current path after command execution
+    if (command.trim().toLowerCase().startsWith('cd ')) {
+      setCurrentPath(fileSystem.pwd());
+    }
 
     // Check if command matches tutorial step
     if (
@@ -135,7 +142,7 @@ const Terminal = () => {
           {output.map((line, index) => (
             <div key={index} className={styles[line.type]}>
               {line.type === "input" && (
-                <span className={styles.prompt}>$ </span>
+                <span className={styles.prompt}>{currentPath}$ </span>
               )}
               {line.content}
             </div>
@@ -146,6 +153,7 @@ const Terminal = () => {
           history={history}
           historyIndex={historyIndex}
           onHistoryNavigate={navigateHistory}
+          currentPath={currentPath}
         />
       </div>
       <div
