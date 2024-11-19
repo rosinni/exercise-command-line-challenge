@@ -21,19 +21,43 @@ const COMMANDS = [
 export const getSuggestions = (input) => {
   const [cmd, ...args] = input.trim().split(' ');
   
-  // If we're completing a command (no space)
+  // If completing a command (no space)
   if (args.length === 0) {
     return COMMANDS.filter(command => 
       command.startsWith(cmd.toLowerCase())
     );
   }
   
-  // If we're completing a path argument
+  // If completing a path argument
   if (['cd', 'ls', 'rm', 'cat', 'cp', 'mv'].includes(cmd.toLowerCase()) && args.length === 1) {
-    const currentDir = fileSystem.currentDir;
-    const prefix = args[0] || '';
-    return Array.from(currentDir.children.keys())
-      .filter(name => name.startsWith(prefix));
+    const path = args[0] || '';
+    const parts = path.split('/');
+    const current = parts.slice(0, -1).join('/');
+    const prefix = parts[parts.length - 1];
+    
+    // Get the directory we're searching in
+    const searchDir = current 
+      ? fileSystem.resolvePath(current) 
+      : fileSystem.currentDir;
+      
+    if (!searchDir) return [];
+    
+    // Get all possible paths from this directory
+    const getPaths = (dir, basePath = '') => {
+      let paths = [];
+      for (const [name, node] of dir.children) {
+        const fullPath = basePath ? `${basePath}/${name}` : name;
+        if (fullPath.startsWith(path)) {
+          paths.push(fullPath);
+        }
+        if (node.type === 'directory') {
+          paths = [...paths, ...getPaths(node, fullPath)];
+        }
+      }
+      return paths;
+    };
+    
+    return getPaths(searchDir);
   }
   
   return [];
