@@ -32,26 +32,24 @@ export const getSuggestions = (input) => {
   if (['cd', 'ls', 'rm', 'cat', 'cp', 'mv'].includes(cmd.toLowerCase()) && args.length === 1) {
     const path = args[0] || '';
     const parts = path.split('/');
-    const current = parts.slice(0, -1).join('/');
     const prefix = parts[parts.length - 1];
+    const parentPath = parts.slice(0, -1).join('/');
     
     // Get the directory we're searching in
-    const searchDir = current 
-      ? fileSystem.resolvePath(current) 
+    const searchDir = parentPath
+      ? fileSystem.resolvePath(parentPath)
       : fileSystem.currentDir;
       
-    if (!searchDir) return [];
+    if (!searchDir || searchDir.type !== 'directory') return [];
     
-    // Get all possible paths from this directory
-    const getPaths = (dir, basePath = '') => {
+    // Get all possible paths from the current directory level
+    const getPaths = (dir) => {
       let paths = [];
       for (const [name, node] of dir.children) {
-        const fullPath = basePath ? `${basePath}/${name}` : name;
-        if (fullPath.startsWith(path)) {
-          paths.push(fullPath);
-        }
-        if (node.type === 'directory') {
-          paths = [...paths, ...getPaths(node, fullPath)];
+        // Only include entries that match the current input prefix
+        if (name.startsWith(prefix)) {
+          // Add trailing slash to directory suggestions
+          paths.push(name + (node.type === 'directory' ? '/' : ''));
         }
       }
       return paths;
