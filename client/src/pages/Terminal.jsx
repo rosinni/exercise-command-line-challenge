@@ -19,6 +19,7 @@ const Terminal = () => {
   const [currentTutorial, setCurrentTutorial] = useState(tutorials[0]);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [showInstructions, setShowInstructions] = useState(true);
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
     height: window.innerHeight
@@ -104,6 +105,13 @@ const Terminal = () => {
           gravity={0.3}
         />
       )}
+      <button 
+        className={styles.hamburgerButton}
+        onClick={() => setShowInstructions(prev => !prev)}
+        aria-label="Toggle instructions"
+      >
+        ☰
+      </button>
       <div 
         className={styles.terminal}
         onClick={() => {
@@ -130,7 +138,9 @@ const Terminal = () => {
           onHistoryNavigate={navigateHistory}
         />
       </div>
-      <Instructions />
+      <div className={`${styles.instructions} ${showInstructions ? '' : styles.collapsed}`}>
+        <Instructions />
+      </div>
       <TutorialOverlay
         currentTutorial={currentTutorial}
         currentStep={currentTutorial?.steps[currentStepIndex]}

@@ -98,12 +98,31 @@
   white-space: pre-wrap;
 }
 
+.hamburgerButton {
+  position: fixed;
+  right: 10px;
+  top: 10px;
+  background: transparent;
+  border: none;
+  color: #00ff00;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 1000;
+  padding: 8px;
+}
+
 .instructions {
   width: 300px;
   padding: 1rem;
   background-color: #2a2a2a;
   border-left: 1px solid #444;
   overflow-y: auto;
+  transition: transform 0.3s ease;
+  transform: translateX(0);
+}
+
+.instructions.collapsed {
+  transform: translateX(100%);
 }
 
 .instructions h2 {
