@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Confetti from "react-confetti";
 import CommandLine from "../components/CommandLine";
 import Instructions from "../components/Instructions";
@@ -30,6 +30,9 @@ const Terminal = () => {
     width: window.innerWidth,
     height: window.innerHeight,
   });
+
+  // Add ref for terminal input
+  const terminalInputRef = useRef(null);
 
   // Update window size on resize
   useEffect(() => {
@@ -132,9 +135,8 @@ const Terminal = () => {
       <div
         className={styles.terminal}
         onClick={() => {
-          const commandInput = document.querySelector(`.${styles.input}`);
-          if (commandInput) {
-            commandInput.focus();
+          if (terminalInputRef.current) {
+            terminalInputRef.current.focus();
           }
         }}
       >
@@ -154,6 +156,7 @@ const Terminal = () => {
           historyIndex={historyIndex}
           onHistoryNavigate={navigateHistory}
           currentPath={currentPath}
+          inputRef={terminalInputRef}
         />
       </div>
       <div

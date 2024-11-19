@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from '../styles/Terminal.module.css';
 import { getSuggestions } from '../lib/commands';
 
@@ -8,12 +8,12 @@ const CommandLine = ({
   history, 
   historyIndex, 
   onHistoryNavigate,
-  currentPath 
+  currentPath,
+  inputRef  // Added inputRef prop
 }) => {
   const [input, setInput] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [selectedSuggestion, setSelectedSuggestion] = useState(-1);
-  const inputRef = useRef(null);
 
   useEffect(() => {
     if (historyIndex !== -1) {
