@@ -1,34 +1,44 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
+/* The original file had Tailwind imports and classes. We've removed those and implemented basic styles using CSS modules. */
 :root {
-  color-scheme: dark;
+  --bg-dark: #000000;
+  --text-light: #f0f0f0;
+  --text-green: #00ff00;
+  --bg-panel: #1a1a1a;
+  --border-color: #444;
 }
 
-@layer base {
-  body {
-    @apply m-0 bg-terminal-black text-terminal-gray-light font-mono antialiased;
-  }
-
-  #root {
-    @apply h-screen w-screen overflow-hidden;
-  }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-/* Terminal-specific styles */
+body {
+  font-family: 'Fira Code', monospace;
+  background-color: var(--bg-dark);
+  color: var(--text-light);
+}
+
+#root {
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+/* Terminal-specific scrollbar styles */
 ::-webkit-scrollbar {
-  @apply w-2;
+  width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-terminal-gray-dark;
+  background: var(--bg-panel);
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-gray-700 rounded;
+  background: var(--border-color);
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-600;
+  background: #555;
 }

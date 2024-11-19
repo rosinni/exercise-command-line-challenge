@@ -38,15 +38,15 @@ const CommandLine = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex items-center gap-2">
-      <span className={`${styles.prompt} text-green-500 font-bold`}>$</span>
+    <form onSubmit={handleSubmit} className={styles.commandLine}>
+      <span className={styles.prompt}>$</span>
       <input
         ref={inputRef}
         type="text"
         value={input}
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={handleKeyDown}
-        className={`${styles.input} flex-1 bg-transparent border-none text-gray-100 font-mono text-base focus:outline-none`}
+        className={styles.input}
         autoFocus
         spellCheck="false"
       />

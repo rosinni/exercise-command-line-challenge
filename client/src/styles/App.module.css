@@ -1,0 +1,17 @@
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-dark);
+  color: var(--text-light);
+  font-family: 'Fira Code', monospace;
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.error h1 {
+  font-size: 1.5rem;
+}
