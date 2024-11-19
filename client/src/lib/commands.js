@@ -12,7 +12,10 @@ const COMMANDS = [
   'mkdir',
   'touch',
   'rm',
-  'tree'
+  'tree',
+  'cat',
+  'cp',
+  'mv'
 ];
 
 export const getSuggestions = (input) => {
@@ -26,7 +29,7 @@ export const getSuggestions = (input) => {
   }
   
   // If we're completing a path argument
-  if (['cd', 'ls', 'rm'].includes(cmd.toLowerCase()) && args.length === 1) {
+  if (['cd', 'ls', 'rm', 'cat', 'cp', 'mv'].includes(cmd.toLowerCase()) && args.length === 1) {
     const currentDir = fileSystem.currentDir;
     const prefix = args[0] || '';
     return Array.from(currentDir.children.keys())
@@ -38,6 +41,20 @@ export const getSuggestions = (input) => {
 
 export const executeCommand = (command) => {
   const [cmd, ...args] = command.trim().split(' ');
+
+  // Handle compound commands with &&
+  if (command.includes('&&')) {
+    const commands = command.split('&&').map(cmd => cmd.trim());
+    let output = '';
+    
+    for (const cmd of commands) {
+      const result = executeCommand(cmd);
+      if (result) {
+        output += result + '\n';
+      }
+    }
+    return output.trim();
+  }
 
   switch (cmd.toLowerCase()) {
     case 'help':
@@ -51,12 +68,15 @@ Available commands:
   tree              - Display directory structure with emojis
 
 File System Commands:
-  ls [path]         - List directory contents
+  ls [-a|-R] [path] - List directory contents (-a: show hidden, -R: recursive)
   cd <path>         - Change directory
   pwd               - Print working directory
   mkdir [-p] <path> - Create a new directory (-p: create parent dirs)
   touch <name>      - Create a new empty file
-  rm [-r] <path>    - Remove a file or directory (-r: recursive)`;
+  rm [-r] <path>    - Remove a file or directory (-r: recursive)
+  cat <file>        - Display file contents
+  cp <src> <dest>   - Copy a file
+  mv <src> <dest>   - Move a file or directory`;
 
     case 'echo':
       return args.join(' ');
@@ -70,9 +90,18 @@ File System Commands:
     case 'tree':
       return fileSystem.tree();
 
-    // File system commands
     case 'ls':
-      return fileSystem.ls(args[0]);
+      let showHidden = false;
+      let recursive = false;
+      let path = '';
+
+      args.forEach(arg => {
+        if (arg === '-a') showHidden = true;
+        else if (arg === '-R') recursive = true;
+        else if (!arg.startsWith('-')) path = arg;
+      });
+
+      return fileSystem.ls(path, { showHidden, recursive });
 
     case 'cd':
       return fileSystem.cd(args[0] || '/');
@@ -99,6 +128,18 @@ File System Commands:
         return fileSystem.rmdir(args[1]);
       }
       return fileSystem.rm(args[0]);
+
+    case 'cat':
+      if (!args[0]) return 'cat: missing operand';
+      return fileSystem.cat(args[0]);
+
+    case 'cp':
+      if (args.length < 2) return 'cp: missing destination operand';
+      return fileSystem.cp(args[0], args[1]);
+
+    case 'mv':
+      if (args.length < 2) return 'mv: missing destination operand';
+      return fileSystem.mv(args[0], args[1]);
 
     default:
       return `Command not found: ${cmd}. Type 'help' for available commands.`;
