@@ -26,13 +26,13 @@ const Terminal = () => {
   };
 
   return (
-    <div className={styles.container}>
-      <div className={styles.terminal}>
-        <div className={styles.output}>
+    <div className={`${styles.container} min-h-screen flex`}>
+      <div className={`${styles.terminal} flex-1 p-4 bg-black`}>
+        <div className={`${styles.output} flex-1 overflow-y-auto`}>
           {output.map((line, index) => (
             <div key={index} className={styles[line.type]}>
               {line.type === 'input' && <span className={styles.prompt}>$ </span>}
-              {line.content}
+              <span className="whitespace-pre-wrap">{line.content}</span>
             </div>
           ))}
         </div>
