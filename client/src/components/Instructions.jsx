@@ -8,6 +8,12 @@ const Instructions = () => {
     { name: 'echo <text>', description: 'Display a line of text' },
     { name: 'date', description: 'Display current date and time' },
     { name: 'whoami', description: 'Display current user' },
+    { name: 'ls [path]', description: 'List directory contents' },
+    { name: 'cd <path>', description: 'Change directory' },
+    { name: 'pwd', description: 'Print working directory' },
+    { name: 'mkdir <name>', description: 'Create a new directory' },
+    { name: 'touch <name>', description: 'Create a new empty file' },
+    { name: 'rm <path>', description: 'Remove a file or directory' },
   ];
 
   return (
