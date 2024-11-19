@@ -54,9 +54,9 @@ File System Commands:
   ls [path]         - List directory contents
   cd <path>         - Change directory
   pwd               - Print working directory
-  mkdir <name>      - Create a new directory
+  mkdir [-p] <path> - Create a new directory (-p: create parent dirs)
   touch <name>      - Create a new empty file
-  rm <path>         - Remove a file or directory`;
+  rm [-r] <path>    - Remove a file or directory (-r: recursive)`;
 
     case 'echo':
       return args.join(' ');
@@ -82,6 +82,10 @@ File System Commands:
 
     case 'mkdir':
       if (!args[0]) return 'mkdir: missing operand';
+      if (args[0] === '-p') {
+        if (!args[1]) return 'mkdir: missing directory operand';
+        return fileSystem.mkdirp(args[1]);
+      }
       return fileSystem.mkdir(args[0]);
 
     case 'touch':
@@ -89,6 +93,11 @@ File System Commands:
       return fileSystem.touch(args[0]);
 
     case 'rm':
+      if (!args[0]) return 'rm: missing operand';
+      if (args[0] === '-r' || args[0] === '-rf') {
+        if (!args[1]) return 'rm: missing directory operand';
+        return fileSystem.rmdir(args[1]);
+      }
       return fileSystem.rm(args[0]);
 
     default:

@@ -33,6 +33,22 @@ class FileSystem {
     return current;
   }
 
+  // Helper to create all parent directories
+  mkdirp(path) {
+    const parts = path.split('/').filter(Boolean);
+    let current = this.currentDir;
+    
+    for (const part of parts) {
+      if (!current.children.has(part)) {
+        const newDir = new FileSystemNode(part, 'directory');
+        newDir.parent = current;
+        current.children.set(part, newDir);
+      }
+      current = current.children.get(part);
+    }
+    return '';
+  }
+
   // File system operations
   mkdir(name) {
     if (this.currentDir.children.has(name)) {
@@ -98,6 +114,29 @@ class FileSystem {
   }
 
   rm(path) {
+    if (!path) {
+      return 'rm: missing operand';
+    }
+    
+    const parts = path.split('/');
+    const name = parts.pop();
+    const parentPath = parts.join('/');
+    const parent = parentPath ? this.resolvePath(parentPath) : this.currentDir;
+    
+    if (!parent || !parent.children.has(name)) {
+      return `rm: ${path}: No such file or directory`;
+    }
+    
+    const target = parent.children.get(name);
+    if (target.type === 'directory') {
+      return `rm: ${path}: Is a directory`;
+    }
+    
+    parent.children.delete(name);
+    return '';
+  }
+
+  rmdir(path) {
     if (!path) {
       return 'rm: missing operand';
     }
