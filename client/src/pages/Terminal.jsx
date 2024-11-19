@@ -72,7 +72,15 @@ const Terminal = () => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.terminal}>
+      <div 
+        className={styles.terminal}
+        onClick={() => {
+          const commandInput = document.querySelector(`.${styles.input}`);
+          if (commandInput) {
+            commandInput.focus();
+          }
+        }}
+      >
         <div className={styles.output}>
           {output.map((line, index) => (
             <div key={index} className={styles[line.type]}>
