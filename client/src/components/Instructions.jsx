@@ -8,6 +8,7 @@ const Instructions = () => {
     { name: 'echo <text>', description: 'Display a line of text' },
     { name: 'date', description: 'Display current date and time' },
     { name: 'whoami', description: 'Display current user' },
+    { name: 'tree', description: 'Display directory structure with emojis' },
     { name: 'ls [path]', description: 'List directory contents' },
     { name: 'cd <path>', description: 'Change directory' },
     { name: 'pwd', description: 'Print working directory' },

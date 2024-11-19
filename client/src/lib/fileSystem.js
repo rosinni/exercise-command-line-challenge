@@ -114,6 +114,24 @@ class FileSystem {
     parent.children.delete(name);
     return '';
   }
+
+  tree(node = this.currentDir, prefix = '', isLast = true) {
+    const nodeType = node.type === 'directory' ? '📁' : '📄';
+    const connector = isLast ? '└── ' : '├── ';
+    let result = prefix + connector + nodeType + ' ' + (node === this.root ? '/' : node.name) + '\n';
+    
+    if (node.type === 'directory') {
+      const children = Array.from(node.children.values());
+      children.forEach((child, index) => {
+        const isLastChild = index === children.length - 1;
+        const newPrefix = prefix + (isLast ? '    ' : '│   ');
+        result += this.tree(child, newPrefix, isLastChild);
+      });
+    }
+    
+    return result;
+  }
 }
 
+// Create and export a single instance
 export const fileSystem = new FileSystem();

@@ -11,7 +11,8 @@ const COMMANDS = [
   'pwd',
   'mkdir',
   'touch',
-  'rm'
+  'rm',
+  'tree'
 ];
 
 export const getSuggestions = (input) => {
@@ -47,6 +48,7 @@ Available commands:
   echo <text>       - Display a line of text
   date              - Display current date and time
   whoami            - Display current user
+  tree              - Display directory structure with emojis
 
 File System Commands:
   ls [path]         - List directory contents
@@ -64,6 +66,9 @@ File System Commands:
 
     case 'whoami':
       return 'guest';
+
+    case 'tree':
+      return fileSystem.tree();
 
     // File system commands
     case 'ls':
