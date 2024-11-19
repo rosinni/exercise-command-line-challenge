@@ -1,0 +1,59 @@
+.overlay {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.tutorialBox {
+  background-color: rgba(0, 0, 0, 0.9);
+  border: 1px solid #00ff00;
+  border-radius: 8px;
+  padding: 1rem;
+  color: #f0f0f0;
+  pointer-events: all;
+  max-width: 500px;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
+}
+
+.tutorialBox h3 {
+  color: #00ff00;
+  margin-bottom: 0.5rem;
+}
+
+.controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.skipButton {
+  background: transparent;
+  border: 1px solid #00ff00;
+  color: #00ff00;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.3s ease;
+}
+
+.skipButton:hover {
+  background: #00ff00;
+  color: black;
+}
+
+.hint {
+  color: #888;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .tutorialBox {
+    width: 90%;
+    margin: 0 auto;
+  }
+}
