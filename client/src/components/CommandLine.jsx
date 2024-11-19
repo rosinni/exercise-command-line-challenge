@@ -46,6 +46,18 @@ const CommandLine = ({
     }
     setSuggestions([]);
     setSelectedSuggestion(-1);
+    
+    // If suggestion ends with '/', trigger new suggestions for the directory
+    if (suggestion.endsWith('/')) {
+      setTimeout(() => {
+        const newSuggestions = getSuggestions(parts[0] + ' ' + suggestion);
+        setSuggestions(newSuggestions);
+        if (newSuggestions.length > 0) {
+          setSelectedSuggestion(0);
+        }
+      }, 0);
+    }
+
     // Set cursor at the end of input after suggestion is applied
     setTimeout(() => {
       if (inputRef.current) {

@@ -32,7 +32,7 @@ export const getSuggestions = (input) => {
   if (['cd', 'ls', 'rm', 'cat', 'cp', 'mv'].includes(cmd.toLowerCase()) && args.length === 1) {
     const path = args[0] || '';
     const parts = path.split('/');
-    const prefix = parts[parts.length - 1];
+    const lastPart = parts[parts.length - 1];
     const parentPath = parts.slice(0, -1).join('/');
     
     // Get the directory we're searching in
@@ -42,20 +42,18 @@ export const getSuggestions = (input) => {
       
     if (!searchDir || searchDir.type !== 'directory') return [];
     
-    // Get all possible paths from the current directory level
-    const getPaths = (dir) => {
-      let paths = [];
-      for (const [name, node] of dir.children) {
-        // Only include entries that match the current input prefix
-        if (name.startsWith(prefix)) {
-          // Add trailing slash to directory suggestions
-          paths.push(name + (node.type === 'directory' ? '/' : ''));
-        }
+    // Get suggestions from current directory level
+    const suggestions = [];
+    for (const [name, node] of searchDir.children) {
+      if (name.startsWith(lastPart)) {
+        // Add trailing slash to directories
+        const suggestion = node.type === 'directory' ? name + '/' : name;
+        // Concatenate with parent path if it exists
+        suggestions.push(parentPath ? `${parentPath}/${suggestion}` : suggestion);
       }
-      return paths;
-    };
+    }
     
-    return getPaths(searchDir);
+    return suggestions;
   }
   
   return [];
