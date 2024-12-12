@@ -9,8 +9,11 @@ import { executeCommand } from "../lib/commands";
 import useCommandHistory from "../hooks/useCommandHistory";
 import { tutorials, checkCommand } from "../lib/tutorials";
 import { fileSystem } from "../lib/fileSystem";
+import WelcomeModal from "../components/WelcomeModal";
+
 
 const Terminal = () => {
+  const [showWelcomeModal, setShowWelcomeModal] = useState(true); 
   // Get language from URL query parameter, default to 'en'
   const [currentLanguage, setCurrentLanguage] = useState(() => {
     const params = new URLSearchParams(window.location.search);
@@ -98,7 +101,7 @@ const Terminal = () => {
     setOutput((prev) => [...prev, { type: "input", content: command }]);
   
     if (command.trim().toLowerCase() === "clear") {
-      setOutput([]); // Limpiar la terminal
+      setOutput([]); //clear the terminal
       return;
     }
   
@@ -106,7 +109,7 @@ const Terminal = () => {
     setOutput((prev) => [...prev, { type: "output", content: result }]);
     addToHistory(command);
   
-    // Verifica si el comando es correcto para el paso actual del tutorial
+    // verified if the command is correct
     if (currentTutorial && checkCommand(command, currentTutorial.steps[currentStepIndex])) {
       // Solo muestra el confeti si el comando es correcto
       setShowConfetti(true);
@@ -144,10 +147,15 @@ const Terminal = () => {
 
   if (!currentTutorial)
     return (
-      <ChooseTutorial
-        onChoose={(tutorialIndex) => loadTutorial(tutorialIndex)}
-        currentLanguage={currentLanguage}
-      />
+      <>
+        {showWelcomeModal && (
+          <WelcomeModal onClose={() => setShowWelcomeModal(false)} />
+        )}
+        <ChooseTutorial
+          onChoose={(tutorialIndex) => loadTutorial(tutorialIndex)}
+          currentLanguage={currentLanguage}
+        />
+      </>
     );
 
   return (
