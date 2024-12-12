@@ -127,7 +127,10 @@ File System Commands:
       return fileSystem.ls(path, { showHidden, recursive });
 
     case "cd":
-      return fileSystem.cd(args[0] || "/");
+      if (!args[0]) return "cd: missing operand";
+      const cdResult = fileSystem.cd(args[0]);
+      return cdResult || `Changed directory to ${fileSystem.pwd()}`;
+      // return fileSystem.cd(args[0] || "/");
 
     case "pwd":
       return fileSystem.pwd();

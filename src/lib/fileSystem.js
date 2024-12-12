@@ -12,6 +12,20 @@ class FileSystem {
   constructor() {
     this.root = new FileSystemNode("/", "directory");
     this.currentDir = this.root;
+    this.initializeDefaultStructure({
+      home: {
+        user1: {},
+        user2: {},
+      },
+      usr: {
+        bin: {},
+      },
+      var: {
+        log: {},
+        tmp: {},
+      },
+      thecmdchallenge: {},
+    });
   }
 
   initializeDefaultStructure(defaultStructure = {}) {

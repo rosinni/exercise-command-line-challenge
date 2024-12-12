@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styles from "../styles/Terminal.module.css";
-import { getSuggestions } from "../lib/commands";
+import {  executeCommand, getSuggestions } from "../lib/commands";
 
 const CommandLine = ({
   onSubmit,
@@ -29,6 +29,7 @@ const CommandLine = ({
     if (trimmedInput === "clear") {
       onClear();
     } else if (trimmedInput) {
+      const output = executeCommand(trimmedInput);
       onSubmit(trimmedInput);
     }
 
@@ -68,19 +69,20 @@ const CommandLine = ({
     }, 0);
   };
 
-  const updateInputWithSelectedSuggestion = () => {
-    if (selectedSuggestion !== -1 && suggestions.length > 0) {
-      const parts = input.split(" ");
-      const newInput =
-        parts.length <= 1
-          ? suggestions[selectedSuggestion]
-          : parts
-              .slice(0, -1)
-              .concat(suggestions[selectedSuggestion])
-              .join(" ");
-      setInput(newInput);
-    }
-  };
+  //PARECE QUE NO ES NECESARIO
+  // const updateInputWithSelectedSuggestion = () => {
+  //   if (selectedSuggestion !== -1 && suggestions.length > 0) {
+  //     const parts = input.split(" ");
+  //     const newInput =
+  //       parts.length <= 1
+  //         ? suggestions[selectedSuggestion]
+  //         : parts
+  //             .slice(0, -1)
+  //             .concat(suggestions[selectedSuggestion])
+  //             .join(" ");
+  //     setInput(newInput);
+  //   }
+  // };
 
   const handleKeyDown = (e) => {
     if (suggestions.length > 0) {
