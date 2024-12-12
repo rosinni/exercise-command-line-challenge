@@ -24,12 +24,13 @@ const CommandLine = ({
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log("handleSubmit called with input:", input); // Depuración
     const trimmedInput = input.trim();
 
     if (trimmedInput === "clear") {
       onClear();
     } else if (trimmedInput) {
-      const output = executeCommand(trimmedInput);
+      // const output = executeCommand(trimmedInput);
       onSubmit(trimmedInput);
     }
 
