@@ -215,7 +215,7 @@ class FileSystem {
     }
 
     this.currentDir = target;
-    return "";
+    return `Changed directory to ${this.pwd()}`;
   }
 
   pwd() {
