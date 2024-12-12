@@ -65,6 +65,21 @@ const Terminal = () => {
     );
   }
 
+  // Check if there is a tutorial in the URL query parameters
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tutorialSlug = params.get("tutorial");
+    
+    if (tutorialSlug) {
+    
+      const tutorialIndex = tutorials.findIndex(t => t.id === tutorialSlug);
+      
+      if (tutorialIndex !== -1) {
+        loadTutorial(tutorialIndex);
+      }
+    }
+  }, []);
+
   useEffect(() => {
     const handleResize = () => {
       setWindowSize({
@@ -111,14 +126,14 @@ const Terminal = () => {
   
     // verified if the command is correct
     if (currentTutorial && checkCommand(command, currentTutorial.steps[currentStepIndex])) {
-      // Solo muestra el confeti si el comando es correcto
+      // just show the confetti if the command is correct
       setShowConfetti(true);
-      setTimeout(() => setShowConfetti(false), 3000); // Esconde el confeti después de 3 segundos
+      setTimeout(() => setShowConfetti(false), 3000); // hide the confetti after 3 seconds
   
-      // Avanza al siguiente paso del tutorial
+      // go to the next tutorial
       nextStep();
     } else {
-      // Si el comando no es correcto, no haces nada con el confeti
+      // if the command is incorrect, hide the confetti
       setShowConfetti(false);
     }
   };
