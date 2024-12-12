@@ -71,16 +71,13 @@ class FileSystem {
 
   // Helper to create all parent directories
   mkdir(name) {
-    console.log("mkdir called with name:", name); // Depuración
+
     if (this.currentDir.children.has(name)) {
-      // return `mkdir: ${name}: Directory already exists`;
-      return `merhuevo: ${name}: Directorio ya existe`;
+      return `mkdir: ${name}: Directory already exists`;
     }
     const newDir = new FileSystemNode(name, "directory");
     newDir.parent = this.currentDir;
     this.currentDir.children.set(name, newDir);
-    console.log("Directory created:", name); // Depuración
-    console.log(this.currentDir.children); // Depuración
     return "";
   }
 
@@ -165,8 +162,7 @@ class FileSystem {
 
   ls(path, { showHidden = false, recursive = false } = {}) {
     const target = path ? this.resolvePath(path) : this.currentDir;
-    // console.log("Current Directory:", this.currentDir); // Depuración
-    // console.log("Target Directory:", target); // Depuración
+  
     if (!target) {
       return `ls: ${path}: No such file or directory`;
     }

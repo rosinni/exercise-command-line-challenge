@@ -96,7 +96,6 @@ const Terminal = () => {
   };
 
   const handleCommand = (command) => {
-    console.log("handleCommand called with input:", command); // Depuración
     if (!command.trim()) return;
   
     setOutput((prev) => [...prev, { type: "input", content: command }]);

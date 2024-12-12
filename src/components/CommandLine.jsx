@@ -24,7 +24,6 @@ const CommandLine = ({
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("handleSubmit called with input:", input); // Depuración
     const trimmedInput = input.trim();
 
     if (trimmedInput === "clear") {
