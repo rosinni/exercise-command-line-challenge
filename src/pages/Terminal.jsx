@@ -9,8 +9,11 @@ import { executeCommand } from "../lib/commands";
 import useCommandHistory from "../hooks/useCommandHistory";
 import { tutorials, checkCommand } from "../lib/tutorials";
 import { fileSystem } from "../lib/fileSystem";
+import WelcomeModal from "../components/WelcomeModal";
+
 
 const Terminal = () => {
+  const [showWelcomeModal, setShowWelcomeModal] = useState(true); 
   // Get language from URL query parameter, default to 'en'
   const [currentLanguage, setCurrentLanguage] = useState(() => {
     const params = new URLSearchParams(window.location.search);
@@ -46,7 +49,7 @@ const Terminal = () => {
   const [currentTutorial, setCurrentTutorial] = useState(null);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
-  const [showInstructions, setShowInstructions] = useState(false);
+  const [showInstructions, setShowInstructions] = useState(true);
   const [currentPath, setCurrentPath] = useState("/");
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
@@ -61,6 +64,21 @@ const Terminal = () => {
       tutorials[tutorialIndex].defaultStructure || {},
     );
   }
+
+  // Check if there is a tutorial in the URL query parameters
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tutorialSlug = params.get("tutorial");
+    
+    if (tutorialSlug) {
+    
+      const tutorialIndex = tutorials.findIndex(t => t.id === tutorialSlug);
+      
+      if (tutorialIndex !== -1) {
+        loadTutorial(tutorialIndex);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -94,45 +112,46 @@ const Terminal = () => {
 
   const handleCommand = (command) => {
     if (!command.trim()) return;
-
+  
     setOutput((prev) => [...prev, { type: "input", content: command }]);
-
+  
     if (command.trim().toLowerCase() === "clear") {
-      setOutput([]);
+      setOutput([]); //clear the terminal
       return;
     }
-
+  
     const result = executeCommand(command);
     setOutput((prev) => [...prev, { type: "output", content: result }]);
     addToHistory(command);
-
-    if (command.trim().toLowerCase().startsWith("cd ")) {
-      setCurrentPath(fileSystem.pwd());
-    }
-
-    if (
-      currentTutorial &&
-      checkCommand(command, currentTutorial.steps[currentStepIndex])
-    ) {
+  
+    // verified if the command is correct
+    if (currentTutorial && checkCommand(command, currentTutorial.steps[currentStepIndex])) {
+      // just show the confetti if the command is correct
       setShowConfetti(true);
-      setTimeout(() => setShowConfetti(false), 3000);
+      setTimeout(() => setShowConfetti(false), 3000); // hide the confetti after 3 seconds
+  
+      // go to the next tutorial
       nextStep();
+    } else {
+      // if the command is incorrect, hide the confetti
+      setShowConfetti(false);
     }
   };
 
-  const handleSkipTutorial = () => {
-    setCurrentTutorial(tutorials[0]);
-    setOutput((prev) => [
-      ...prev,
-      {
-        type: "system",
-        content:
-          currentLanguage === "en"
-            ? 'Tutorial skipped. Type "help" if you need assistance.'
-            : 'Tutorial omitido. Escribe "help" si necesitas ayuda.',
-      },
-    ]);
-  };
+
+  // const handleSkipTutorial = () => {
+  //   setCurrentTutorial(tutorials[0]);
+  //   setOutput((prev) => [
+  //     ...prev,
+  //     {
+  //       type: "system",
+  //       content:
+  //         currentLanguage === "en"
+  //           ? 'Tutorial skipped. Type "help" if you need assistance.'
+  //           : 'Tutorial omitido. Escribe "help" si necesitas ayuda.',
+  //     },
+  //   ]);
+  // };
 
   useEffect(() => {
     const terminal = document.querySelector(`.${styles.output}`);
@@ -143,10 +162,15 @@ const Terminal = () => {
 
   if (!currentTutorial)
     return (
-      <ChooseTutorial
-        onChoose={(tutorialIndex) => loadTutorial(tutorialIndex)}
-        currentLanguage={currentLanguage}
-      />
+      <>
+        {showWelcomeModal && (
+          <WelcomeModal onClose={() => setShowWelcomeModal(false)} />
+        )}
+        <ChooseTutorial
+          onChoose={(tutorialIndex) => loadTutorial(tutorialIndex)}
+          currentLanguage={currentLanguage}
+        />
+      </>
     );
 
   return (
@@ -193,6 +217,7 @@ const Terminal = () => {
         </div>
         <CommandLine
           onSubmit={handleCommand}
+          onClear={() => setOutput([])}
           history={history}
           historyIndex={historyIndex}
           onHistoryNavigate={navigateHistory}
@@ -208,7 +233,7 @@ const Terminal = () => {
       <TutorialOverlay
         currentTutorial={currentTutorial}
         currentStep={currentTutorial?.steps[currentStepIndex]}
-        onSkip={handleSkipTutorial}
+        // onSkip={handleSkipTutorial}
         onContinue={() => nextStep()}
         currentLanguage={currentLanguage}
       />

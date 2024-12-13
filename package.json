@@ -4,9 +4,8 @@
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "build": "vite build --config vite.config.js",
-    "start": "NODE_ENV=production node dist/index.js",
-    "db:push": "drizzle-kit push"
+    "build": "vite build --config vite.config.js", 
+    "start": "vite"  
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",

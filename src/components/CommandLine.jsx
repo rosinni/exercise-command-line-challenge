@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styles from "../styles/Terminal.module.css";
-import { getSuggestions } from "../lib/commands";
+import {  executeCommand, getSuggestions } from "../lib/commands";
 
 const CommandLine = ({
   onSubmit,
@@ -29,6 +29,7 @@ const CommandLine = ({
     if (trimmedInput === "clear") {
       onClear();
     } else if (trimmedInput) {
+      // const output = executeCommand(trimmedInput);
       onSubmit(trimmedInput);
     }
 
@@ -48,16 +49,7 @@ const CommandLine = ({
     setSuggestions([]);
     setSelectedSuggestion(-1);
 
-    // If suggestion ends with '/', trigger new suggestions for the directory
-    // if (suggestion.endsWith('/')) {
-    //   setTimeout(() => {
-    //     const newSuggestions = getSuggestions(parts[0] + ' ' + suggestion);
-    //     setSuggestions(newSuggestions);
-    //     if (newSuggestions.length > 0) {
-    //       setSelectedSuggestion(0);
-    //     }
-    //   }, 0);
-    // }
+
 
     // Set cursor at the end of input after suggestion is applied
     setTimeout(() => {
@@ -68,20 +60,7 @@ const CommandLine = ({
     }, 0);
   };
 
-  const updateInputWithSelectedSuggestion = () => {
-    if (selectedSuggestion !== -1 && suggestions.length > 0) {
-      const parts = input.split(" ");
-      const newInput =
-        parts.length <= 1
-          ? suggestions[selectedSuggestion]
-          : parts
-              .slice(0, -1)
-              .concat(suggestions[selectedSuggestion])
-              .join(" ");
-      setInput(newInput);
-    }
-  };
-
+  
   const handleKeyDown = (e) => {
     if (suggestions.length > 0) {
       if (e.key === "ArrowUp" || e.key === "ArrowDown") {
