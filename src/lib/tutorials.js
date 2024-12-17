@@ -175,7 +175,7 @@ export const checkCommand = (command, currentStep) => {
   if (!currentStep) return false;
 
   // If the step is a discussion point or non-command step (expectedCommand is 'N/A')
-  if (currentStep.expectedCommand) {
+  if (currentStep.expectedCommand === 'N/A') {
     // Consider these steps as automatically completed when any input is provided
     return true;
   }
