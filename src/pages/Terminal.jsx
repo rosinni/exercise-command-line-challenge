@@ -121,12 +121,13 @@ const Terminal = () => {
     }
   
     const result = executeCommand(command);
-    setOutput((prev) => [...prev, { type: "output", content: result }]);
+  
+    setOutput((prev) => [...prev, { type: "output", content: result.output }]);
     addToHistory(command);
   
     // verified if the command is correct
-    if (currentTutorial && checkCommand(command, currentTutorial.steps[currentStepIndex])) {
-      // just show the confetti if the command is correct
+      if (currentTutorial && result.correct && checkCommand(command, currentTutorial.steps[currentStepIndex])) {
+    // just show the confetti if the command is correct
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 3000); // hide the confetti after 3 seconds
   

@@ -69,19 +69,27 @@ export const executeCommand = (command) => {
   if (command.includes("&&")) {
     const commands = command.split("&&").map((cmd) => cmd.trim());
     let output = "";
+    let allCorrect = true;
 
     for (const cmd of commands) {
       const result = executeCommand(cmd);
-      if (result) {
-        output += result + "\n";
+
+      if (result.output) {
+        output += result.output + "\n";
+      }
+      if (!result.correct) {
+        allCorrect = false;
       }
     }
-    return output.trim();
+    return { output: output.trim(), correct: allCorrect };
   }
+
+  let output;
+  let correct = true;
 
   switch (cmd.toLowerCase()) {
     case "help":
-      return `
+      output = `
 Available commands:
   help              - Show this help message
   clear             - Clear the terminal screen
@@ -100,18 +108,22 @@ File System Commands:
   cat <file>        - Display file contents
   cp <src> <dest>   - Copy a file
   mv <src> <dest>   - Move a file or directory`;
-
+      break;
     case "echo":
-      return args.join(" ");
+      output = args.join(" ");
+      break;
 
     case "date":
-      return new Date().toLocaleString();
+      output = new Date().toLocaleString();
+      break;
 
     case "whoami":
-      return "guest";
+      output = "guest";
+      break;
 
     case "tree":
-      return fileSystem.tree();
+      output = fileSystem.tree();
+      break;
 
     case "ls":
       let showHidden = false;
@@ -124,50 +136,95 @@ File System Commands:
         else if (!arg.startsWith("-")) path = arg;
       });
 
-      return fileSystem.ls(path, { showHidden, recursive });
+     
+      output = fileSystem.ls(path, { showHidden, recursive });
+      break;
 
     case "cd":
-      if (!args[0]) return "cd: missing operand";
-      const cdResult = fileSystem.cd(args[0]);
-      return cdResult || `Changed directory to ${fileSystem.pwd()}`;
-      // return fileSystem.cd(args[0] || "/");
+      if (!args[0]) {
+        output = "cd: missing operand";
+        correct = false;
+      } else {
+        const cdResult = fileSystem.cd(args[0]);
+        output = cdResult || `Changed directory to ${fileSystem.pwd()}`;
+      }
+      break;
 
     case "pwd":
-      return fileSystem.pwd();
+      output = fileSystem.pwd();
+      break;
 
     case "mkdir":
-      if (!args[0]) return "mkdir: missing operand";
-      if (args[0] === "-p") {
-        if (!args[1]) return "mkdir: missing directory operand";
-        return fileSystem.mkdirp(args[1]);
+      if (!args[0]) {
+        output = "mkdir: missing operand";
+        correct = false;
+      } else if (args[0] === "-p") {
+        if (!args[1]) {
+          output = "mkdir: missing directory operand";
+          correct = false;
+        } else {
+          output = fileSystem.mkdirp(args[1]);
+        }
+      } else {
+        output = fileSystem.mkdir(args[0]);
       }
-      return fileSystem.mkdir(args[0]);
+      break;
 
     case "touch":
-      if (!args[0]) return "touch: missing operand";
-      return fileSystem.touch(args[0]);
+      if (!args[0]) {
+        output = "touch: missing operand";
+        correct = false;
+      } else {
+        output = fileSystem.touch(args[0]);
+      }
+      break;
 
     case "rm":
-      if (!args[0]) return "rm: missing operand";
-      if (args[0] === "-r" || args[0] === "-rf") {
-        if (!args[1]) return "rm: missing directory operand";
-        return fileSystem.rmdir(args[1]);
+      if (!args[0]) {
+        output = "rm: missing operand";
+        correct = false;
+      } else if (args[0] === "-r" || args[0] === "-rf") {
+        if (!args[1]) {
+          output = "rm: missing directory operand";
+          correct = false;
+        } else {
+          output = fileSystem.rmdir(args[1]);
+        }
+      } else {
+        output = fileSystem.rm(args[0]);
       }
-      return fileSystem.rm(args[0]);
+      break;
 
     case "cat":
-      if (!args[0]) return "cat: missing operand";
-      return fileSystem.cat(args[0]);
+      if (!args[0]) {
+        output = "cat: missing operand";
+        correct = false;
+      } else {
+        output = fileSystem.cat(args[0]);
+      }
+      break;
 
     case "cp":
-      if (args.length < 2) return "cp: missing destination operand";
-      return fileSystem.cp(args[0], args[1]);
+      if (args.length < 2) {
+        output = "cp: missing destination operand";
+        correct = false;
+      } else {
+        output = fileSystem.cp(args[0], args[1]);
+      }
+      break;
 
     case "mv":
-      if (args.length < 2) return "mv: missing destination operand";
-      return fileSystem.mv(args[0], args[1]);
+      if (args.length < 2) {
+        output = "mv: missing destination operand";
+        correct = false;
+      } else {
+        output = fileSystem.mv(args[0], args[1]);
+      }
+      break;
 
     default:
-      return `Command not found: ${cmd}. Type 'help' for available commands.`;
+      output = `Command not found: ${cmd}. Type 'help' for available commands.`;
+      correct = false;
   }
+  return { output, correct };
 };
