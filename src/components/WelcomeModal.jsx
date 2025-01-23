@@ -1,15 +1,30 @@
 import React from "react";
 import styles from "../styles/WelcomeModal.module.css";
 
-const WelcomeModal = ({ onClose }) => {
+const WelcomeModal = ({ currentLanguage, onClose }) => {
+  const translations = {
+    en: {
+      welcome: "Welcome to 4Geeks' Terminal Simulator",
+      instructions: "Follow the instructions to complete the tutorial.",
+      close: "Close",
+    },
+    es: {
+      welcome: "Bienvenido al Simulador de Terminal de 4Geeks",
+      instructions: "Sigue las instrucciones para completar el tutorial.",
+      close: "Cerrar",
+    },
+  };
+
+  const t = translations[currentLanguage];
+
   return (
     <div className={styles.overlay}>
       <div className={styles.modal}>
-        <h2>Welcome to the Terminal Simulator</h2>
-        <p>This application simulates a terminal environment. Watch the video below to learn how to use it.</p>
+        <h2>{t.welcome}</h2>
+        <p>{t.instructions}</p>
         <div className={styles.videoContainer}>
           <iframe
-            width="560"
+            width="100%"
             height="315"
             src="https://www.youtube.com/embed/dQw4w9WgXcQ"
             title="YouTube video player"
@@ -18,7 +33,7 @@ const WelcomeModal = ({ onClose }) => {
             allowFullScreen
           ></iframe>
         </div>
-        <button onClick={onClose} className={styles.closeButton}>Get Started</button>
+        <button onClick={onClose} className={styles.closeButton}>{t.close}</button>
       </div>
     </div>
   );

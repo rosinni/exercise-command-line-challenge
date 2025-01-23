@@ -174,7 +174,9 @@ const Terminal = () => {
     return (
       <>
         {showWelcomeModal && (
-          <WelcomeModal onClose={() => setShowWelcomeModal(false)} />
+          <WelcomeModal
+          currentLanguage={currentLanguage} 
+          onClose={() => setShowWelcomeModal(false)} />
         )}
         <ChooseTutorial
           onChoose={(tutorialIndex) => loadTutorial(tutorialIndex)}
