@@ -75,12 +75,6 @@ const Terminal = () => {
       tutorials[tutorialIndex].defaultStructure || {},
     );
   }
-  // function loadTutorial(tutorialIndex) {
-  //   setCurrentTutorial(tutorials[tutorialIndex]);
-  //   fileSystem.initializeDefaultStructure(
-  //     tutorials[tutorialIndex].defaultStructure || {},
-  //   );
-  // }
 
   // Check if there is a tutorial in the URL query parameters
   useEffect(() => {

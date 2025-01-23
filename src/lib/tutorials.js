@@ -85,6 +85,10 @@ export const tutorials = [
     steps: [
       {
         id: "cd_into_directory",
+        introduction: {
+          en: "The 'cd' command, short for 'change directory', is used to navigate between directories in the file system. It's essential for moving around and accessing different parts of your file system.",
+          es: "El comando 'cd', abreviatura de 'change directory', se usa para navegar entre directorios en el sistema de archivos. Es esencial para moverse y acceder a diferentes partes de tu sistema de archivos.",
+        },
         instruction: {
           en: "Get inside the 'thecmdchallenge/' directory.",
           es: "Ingresa al directorio 'thecmdchallenge/'",
@@ -97,6 +101,10 @@ export const tutorials = [
       },
       {
         id: "pwd_check",
+        introduction: {
+          en: "The 'pwd' command stands for 'print working directory'. It displays the full path of the current directory you are in. This is useful for confirming your current location in the file system.",
+          es: "El comando 'pwd' significa 'print working directory'. Muestra la ruta completa del directorio actual en el que te encuentras. Esto es útil para confirmar tu ubicación actual en el sistema de archivos.",
+        },
         instruction: {
           en: "Now that we moved, verify your current location using pwd.",
           es: "Ahora que nos movimos, verifica tu ubicación actual usando pwd.",
@@ -109,6 +117,10 @@ export const tutorials = [
       },
       {
         id: "list_files",
+        introduction: {
+          en: "The 'ls' command lists the contents of a directory. It's useful for seeing what files and directories are present in your current location.",
+          es: "El comando 'ls' lista el contenido de un directorio. Es útil para ver qué archivos y directorios están presentes en tu ubicación actual.",
+        },
         instruction: {
           en: "List all files in the current directory.",
           es: "Lista todos los archivos en el directorio actual.",
@@ -121,6 +133,10 @@ export const tutorials = [
       },
       {
         id: "create_directory",
+        introduction: {
+          en: "The 'mkdir' command stands for 'make directory'. It is used to create new directories in the file system. This is useful for organizing files into separate folders.",
+          es: "El comando 'mkdir' significa 'make directory'. Se usa para crear nuevos directorios en el sistema de archivos. Esto es útil para organizar archivos en carpetas separadas.",
+        },
         instruction: {
           en: "Create a new directory called 'exercise_files'.",
           es: "Crea un nuevo directorio llamado 'exercise_files'.",
@@ -133,6 +149,10 @@ export const tutorials = [
       },
       {
         id: "create_file",
+        introduction: {
+          en: "The 'touch' command is used to create new empty files. It's a quick way to create a file without opening an editor.",
+          es: "El comando 'touch' se usa para crear nuevos archivos vacíos. Es una forma rápida de crear un archivo sin abrir un editor.",
+        },
         instruction: {
           en: "Create a new file called 'test.txt'.",
           es: "Crea un nuevo archivo llamado 'test.txt'.",
@@ -145,6 +165,10 @@ export const tutorials = [
       },
       {
         id: "remove_file",
+        introduction: {
+          en: "The 'rm' command stands for 'remove'. It is used to delete files from the file system. Be careful with this command as it permanently removes files.",
+          es: "El comando 'rm' significa 'remove'. Se usa para eliminar archivos del sistema de archivos. Ten cuidado con este comando ya que elimina archivos de forma permanente.",
+        },
         instruction: {
           en: "Remove the file 'test.txt'.",
           es: "Elimina el archivo 'test.txt'.",
@@ -157,6 +181,10 @@ export const tutorials = [
       },
       {
         id: "tree_view",
+        introduction: {
+          en: "The 'tree' command displays the directory structure in a tree-like format. It's useful for visualizing the hierarchy of files and directories.",
+          es: "El comando 'tree' muestra la estructura del directorio en un formato similar a un árbol. Es útil para visualizar la jerarquía de archivos y directorios.",
+        },
         instruction: {
           en: "Display the directory structure using the tree command.",
           es: "Muestra la estructura del directorio usando el comando tree.",
@@ -170,6 +198,7 @@ export const tutorials = [
     ],
   },
 ];
+
 
 export const checkCommand = (command, currentStep) => {
   if (!currentStep) return false;
