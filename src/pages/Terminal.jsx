@@ -69,10 +69,18 @@ const Terminal = () => {
 
   function loadTutorial(tutorialIndex) {
     setCurrentTutorial(tutorials[tutorialIndex]);
+    setCurrentStepIndex(0); // Reset the step index
+    setOutput([]); // Reset the output
     fileSystem.initializeDefaultStructure(
       tutorials[tutorialIndex].defaultStructure || {},
     );
   }
+  // function loadTutorial(tutorialIndex) {
+  //   setCurrentTutorial(tutorials[tutorialIndex]);
+  //   fileSystem.initializeDefaultStructure(
+  //     tutorials[tutorialIndex].defaultStructure || {},
+  //   );
+  // }
 
   // Check if there is a tutorial in the URL query parameters
   useEffect(() => {
@@ -185,6 +193,9 @@ const Terminal = () => {
       </>
     );
 
+  const progress = ((currentStepIndex + 1) / currentTutorial.steps.length) * 100;
+
+
   return (
     <div className={styles.container}>
       {showConfetti && (
@@ -239,6 +250,11 @@ const Terminal = () => {
         <button onClick={handleGoBack} className={styles.goBackButton}>
         ←
       </button>
+      {currentTutorial.id === "cmd_challenges" && (
+        <div className={styles.progressContainer}>
+          <div className={styles.progressBar} style={{ width: `${progress}%` }}></div>
+        </div>
+      )}
       </div>
       <div
         className={`${styles.instructions} ${showInstructions ? "" : styles.collapsed}`}
