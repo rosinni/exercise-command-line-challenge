@@ -24,6 +24,7 @@
   padding-bottom: 1rem;
 }
 
+
 .commandLineContainer {
   position: relative;
   width: 100%;
@@ -99,7 +100,9 @@
   color: #f0f0f0;
   margin-bottom: 0.5rem;
   white-space: pre-wrap;
+  margin: 4%;
 }
+
 
 .hamburgerButton {
   position: fixed;
@@ -168,6 +171,21 @@
 
 .shortcuts li {
   margin: 0.5rem 0;
+  color: #ccc;
+}
+
+.goBackButton {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 24px;
+  color: #fff;
+}
+
+.goBackButton:hover {
   color: #ccc;
 }
 

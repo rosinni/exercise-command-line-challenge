@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useLocation } from "wouter";
 import Confetti from "react-confetti";
 import CommandLine from "../components/CommandLine";
 import Instructions from "../components/Instructions";
@@ -57,6 +58,14 @@ const Terminal = () => {
   });
 
   const terminalInputRef = useRef(null);
+
+  const [, setLocation] = useLocation();
+
+
+  const handleGoBack = () => {
+    setCurrentTutorial(null);
+    setLocation("/");
+  };
 
   function loadTutorial(tutorialIndex) {
     setCurrentTutorial(tutorials[tutorialIndex]);
@@ -225,6 +234,9 @@ const Terminal = () => {
           currentPath={currentPath}
           inputRef={terminalInputRef}
         />
+        <button onClick={handleGoBack} className={styles.goBackButton}>
+        ←
+      </button>
       </div>
       <div
         className={`${styles.instructions} ${showInstructions ? "" : styles.collapsed}`}
